@@ -734,6 +734,11 @@ function performConcurrentWorkOnRoot(root, didTimeout) {
   currentEventTime = NoTimestamp;
   currentEventTransitionLane = NoLanes;
 
+	console.log('executionContext in concurrent: ', executionContext);
+	console.log('RenderContext in concurrent: ', RenderContext);
+	console.log('CommitContext in concurrent: ', CommitContext);
+	console.log('NoContext in concurrent: ', NoContext);
+
   invariant(
     (executionContext & (RenderContext | CommitContext)) === NoContext,
     'Should not already be working.',
@@ -956,6 +961,10 @@ function performSyncWorkOnRoot(root) {
   if (enableProfilerTimer && enableProfilerNestedUpdatePhase) {
     syncNestedUpdateFlag();
   }
+	console.log('executionContext in sync wokr on root: ', executionContext);
+	console.log('RenderContext in sync work on root: ', RenderContext);
+	console.log('CommitContext in sync work on root: ', CommitContext);
+	console.log('NoContext in sync work on root: ', NoContext);
 
   invariant(
     (executionContext & (RenderContext | CommitContext)) === NoContext,
@@ -1075,6 +1084,7 @@ export function deferredUpdates<A>(fn: () => A): A {
 }
 
 export function batchedUpdates<A, R>(fn: A => R, a: A): R {
+	console.log('in batched update');
   const prevExecutionContext = executionContext;
   executionContext |= BatchedContext;
   try {
@@ -1129,6 +1139,7 @@ export function discreteUpdates<A, B, C, D, R>(
 }
 
 export function unbatchedUpdates<A, R>(fn: (a: A) => R, a: A): R {
+	console.log('in unbatched update');
   const prevExecutionContext = executionContext;
   executionContext &= ~BatchedContext;
   executionContext |= LegacyUnbatchedContext;
@@ -1713,6 +1724,10 @@ function commitRootImpl(root, renderPriorityLevel) {
   } while (rootWithPendingPassiveEffects !== null);
   flushRenderPhaseStrictModeWarningsInDEV();
 
+	console.log('executionContext in commitRootImpl: ', executionContext);
+	console.log('RenderContext in commitrootImpl: ', RenderContext);
+	console.log('CommitContext in commitRootImpl: ', CommitContext);
+	console.log('NoContext in commitRootImpl: ', NoContext);
   invariant(
     (executionContext & (RenderContext | CommitContext)) === NoContext,
     'Should not already be working.',
