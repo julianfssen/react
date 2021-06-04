@@ -22,10 +22,12 @@ class App extends React.Component {
 
   render() {
     return (
-      <div>
-        <Header />
-        <Fixtures />
-      </div>
+			<React.StrictMode>
+        <div>
+          <Header />
+          <Fixtures />
+        </div>
+			</React.StrictMode>
     );
   }
 }
