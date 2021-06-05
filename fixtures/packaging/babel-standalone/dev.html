@@ -5,8 +5,32 @@
     <script src="https://unpkg.com/babel-standalone@6/babel.js"></script>
     <div id="container"></div>
     <script type="text/babel">
+			class AppClass extends React.Component {
+        constructor(props) {
+          super(props);
+          this.state = {
+            num: 99
+          };
+        }
+      
+        componentDidMount() {
+          this.setState((state) => {
+            return { num: state.num + 2 };
+          });
+          // debugger;
+          alert('AppClass');
+        }
+      
+        render() {
+          return (
+            <div className="App">
+              <h1>Num: {this.state.num}</h1>
+            </div>
+          );
+        }
+      }
       ReactDOM.render(
-        <h1>Hello World!</h1>,
+				<AppClass />,
         document.getElementById('container')
       );
     </script>

@@ -142,8 +142,10 @@ if (__DEV__) {
       function callCallback() {
         didCall = true;
         restoreAfterDispatch();
+				console.log('invokeguardedcallback invoking: ', context, funcArgs);
         func.apply(context, funcArgs);
         didError = false;
+				console.log('invokeguardedcallback diderror: ', didError);
       }
 
       // Create a global error event handler. We use this to capture the value
@@ -165,10 +167,13 @@ if (__DEV__) {
       function handleWindowError(event) {
         error = event.error;
         didSetError = true;
+				console.log('event: ', event);
+				console.log('in handlewindowerror: ', error);
         if (error === null && event.colno === 0 && event.lineno === 0) {
           isCrossOriginError = true;
         }
         if (event.defaultPrevented) {
+				  console.log('error prevented by default');
           // Some other error handler has prevented default.
           // Browsers silence the error report if this happens.
           // We'll remember this to later decide whether to log it or not.
@@ -184,6 +189,7 @@ if (__DEV__) {
 
       // Create a fake event type.
       const evtType = `react-${name ? name : 'invokeguardedcallback'}`;
+			console.log('event type: ', evtType);
 
       // Attach our event handlers
       window.addEventListener('error', handleWindowError);
@@ -199,6 +205,7 @@ if (__DEV__) {
       }
 
       if (didCall && didError) {
+				console.log('called diderror');
         if (!didSetError) {
           // The callback errored, but the error event never fired.
           error = new Error(
@@ -229,6 +236,7 @@ if (__DEV__) {
         // https://github.com/facebook/react/issues/16734
         // https://github.com/facebook/react/issues/16585
         // Fall back to the production implementation.
+				console.log('didnt call at all');
         restoreAfterDispatch();
         return invokeGuardedCallbackProd.apply(this, arguments);
       }
