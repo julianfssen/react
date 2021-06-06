@@ -278,6 +278,9 @@ function unstable_wrapCallback(callback) {
 
 function unstable_scheduleCallback(priorityLevel, callback, options) {
   var currentTime = getCurrentTime();
+	console.log('in unstable schedulecallback');
+	console.log('callback in scheduler: ', callback);
+	console.log('priority level: ', priorityLevel);
 
   var startTime;
   if (typeof options === 'object' && options !== null) {
@@ -325,8 +328,11 @@ function unstable_scheduleCallback(priorityLevel, callback, options) {
     newTask.isQueued = false;
   }
 
+	console.log('scheduler task: ', newTask);
+
   if (startTime > currentTime) {
     // This is a delayed task.
+	  console.log('this is a delayed task');
     newTask.sortIndex = startTime;
     push(timerQueue, newTask);
     if (peek(taskQueue) === null && newTask === peek(timerQueue)) {
@@ -341,8 +347,10 @@ function unstable_scheduleCallback(priorityLevel, callback, options) {
       requestHostTimeout(handleTimeout, startTime - currentTime);
     }
   } else {
+	  console.log('this is a not delayed task');
     newTask.sortIndex = expirationTime;
     push(taskQueue, newTask);
+		console.log('task queue: ', taskQueue);
     if (enableProfiling) {
       markTaskStart(newTask, currentTime);
       newTask.isQueued = true;
@@ -351,6 +359,7 @@ function unstable_scheduleCallback(priorityLevel, callback, options) {
     // wait until the next time we yield.
     if (!isHostCallbackScheduled && !isPerformingWork) {
       isHostCallbackScheduled = true;
+			console.log('requesting host callback');
       requestHostCallback(flushWork);
     }
   }

@@ -145,12 +145,18 @@ export function scheduleSyncCallback(callback: SchedulerCallback) {
   // Push this callback into an internal queue. We'll flush these either in
   // the next tick, or earlier if something calls `flushSyncCallbackQueue`.
   if (syncQueue === null) {
+		console.log('syncQeueu before: ', syncQueue);
+		console.log('callback to be added to syncQueue: ', callback);
     syncQueue = [callback];
     // Flush the queue in the next tick, at the earliest.
+		console.log('syncQueue: ', syncQueue);
+		console.log('flushing callback in sync queue in schedulesynccallback', callback);
+		console.log('flushSyncCallbackQueueImpl: ', flushSyncCallbackQueueImpl);
     immediateQueueCallbackNode = Scheduler_scheduleCallback(
       Scheduler_ImmediatePriority,
       flushSyncCallbackQueueImpl,
     );
+		console.log('immediateQueueCallbackNode: ', immediateQueueCallbackNode);
   } else {
     // Push onto existing queue. Don't need to schedule a callback because
     // we already scheduled one when we created the queue.
@@ -171,12 +177,14 @@ export function flushSyncCallbackQueue() {
     immediateQueueCallbackNode = null;
     Scheduler_cancelCallback(node);
   }
+	console.log('inside flushSyncCallbackQueue');
   flushSyncCallbackQueueImpl();
 }
 
 function flushSyncCallbackQueueImpl() {
   if (!isFlushingSyncQueue && syncQueue !== null) {
     // Prevent re-entrancy.
+		console.log('inside flushSyncCallbackQueueImpl');
     isFlushingSyncQueue = true;
     let i = 0;
     if (decoupleUpdatePriorityFromScheduler) {

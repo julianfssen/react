@@ -52,6 +52,7 @@ if (
       }
     }
   };
+	console.log('calling scheduler running in a non-dom environment');
   requestHostCallback = function(cb) {
     if (_callback !== null) {
       // Protect against re-entrancy.
@@ -183,6 +184,7 @@ if (
   };
 
   const performWorkUntilDeadline = () => {
+		console.log('in perform work until deadline');
     if (scheduledHostCallback !== null) {
       const currentTime = getCurrentTime();
       // Yield after `yieldInterval` ms, regardless of where we are in the vsync
@@ -191,6 +193,7 @@ if (
       deadline = currentTime + yieldInterval;
       const hasTimeRemaining = true;
       try {
+				console.log('calling back in pwud: ', scheduledHostCallback);
         const hasMoreWork = scheduledHostCallback(
           hasTimeRemaining,
           currentTime,
@@ -220,12 +223,15 @@ if (
   const channel = new MessageChannel();
   const port = channel.port2;
   channel.port1.onmessage = performWorkUntilDeadline;
+	console.log('port2 channel: ', port);
 
   requestHostCallback = function(callback) {
+		console.log('requesting host callback with messageChannel: ', callback);
     scheduledHostCallback = callback;
     if (!isMessageLoopRunning) {
       isMessageLoopRunning = true;
       port.postMessage(null);
+			console.log('port post messaged');
     }
   };
 

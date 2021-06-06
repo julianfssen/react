@@ -80,6 +80,8 @@ export function unstable_scheduleCallback<T>(
   options?: {delay?: number},
 ): CallbackNode {
   let postTaskPriority;
+	console.log('in unstable schedulecallback');
+	console.log('priority level: ', priorityLevel);
   switch (priorityLevel) {
     case ImmediatePriority:
     case UserBlockingPriority:
@@ -104,10 +106,14 @@ export function unstable_scheduleCallback<T>(
     signal: controller.signal,
   };
 
+	console.log('postTaskOptions: ', postTaskOptions);
+
   const node = {
     _controller: controller,
   };
+	console.log('node: ', node);
 
+	console.log('scheduler: ', scheduler);
   scheduler
     .postTask(
       runTask.bind(null, priorityLevel, postTaskPriority, node, callback),
@@ -126,9 +132,11 @@ function runTask<T>(
 ) {
   deadline = getCurrentTime() + yieldInterval;
   try {
+		console.log('scheduler callback', callback);
     currentPriorityLevel_DEPRECATED = priorityLevel;
     const didTimeout_DEPRECATED = false;
     const result = callback(didTimeout_DEPRECATED);
+		console.log('callback result: ', result);
     if (typeof result === 'function') {
       // Assume this is a continuation
       const continuation: SchedulerCallback<T> = (result: any);
@@ -154,6 +162,7 @@ function runTask<T>(
         .catch(handleAbortError);
     }
   } catch (error) {
+		console.log('error in scheduler callback: ', error);
     // We're inside a `postTask` promise. If we don't handle this error, then it
     // will trigger an "Unhandled promise rejection" error. We don't want that,
     // but we do want the default error reporting behavior that normal

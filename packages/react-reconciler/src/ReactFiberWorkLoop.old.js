@@ -574,6 +574,7 @@ export function scheduleUpdateOnFiber(
       // This is a legacy edge case. The initial mount of a ReactDOM.render-ed
       // root inside of batchedUpdates should be synchronous, but layout updates
       // should be deferred until the end of the batch.
+			console.log('calling perfrmSyncWorkOnRoot in scheduleUpdateOnFiber 578', root);
       performSyncWorkOnRoot(root);
     } else {
       ensureRootIsScheduled(root, eventTime);
@@ -713,10 +714,13 @@ function ensureRootIsScheduled(root: FiberRoot, currentTime: number) {
   if (newCallbackPriority === SyncLanePriority) {
     // Special case: Sync React callbacks are scheduled on a special
     // internal queue
+		console.log('calling perfrmSyncWorkOnRoot in ensureRootIsScheduled 717', root);
+		console.log('root: ', root);
     newCallbackNode = scheduleSyncCallback(
       performSyncWorkOnRoot.bind(null, root),
     );
   } else if (newCallbackPriority === SyncBatchedLanePriority) {
+		console.log('calling perfrmSyncWorkOnRoot in ensureRootIsScheduled 722', root);
     newCallbackNode = scheduleCallback(
       ImmediateSchedulerPriority,
       performSyncWorkOnRoot.bind(null, root),
@@ -1008,7 +1012,7 @@ function performSyncWorkOnRoot(root) {
 
   if (root.tag !== LegacyRoot && exitStatus === RootErrored) {
     executionContext |= RetryAfterError;
-	  console.log('execution context |= performSyncWorkOnRoot 1011: ', executionContext, RetryAfterError);
+	  console.log('execution context |= RetryAfterError 1011: ', executionContext, RetryAfterError);
 
     // If an error occurred during hydration,
     // discard server response and fall back to client side render.
@@ -1127,7 +1131,7 @@ export function batchedUpdates<A, R>(fn: A => R, a: A): R {
     return fn(a);
   } finally {
     executionContext = prevExecutionContext;
-	  console.log('execution context batchedUpdates 1127: ', executionContext);
+	  console.log('execution context batchedUpdates 1127: ', executionContext, prevExecutionContext);
     if (executionContext === NoContext) {
       // Flush the immediate callbacks that were scheduled during this batch
       resetRenderTimer();
@@ -1144,7 +1148,7 @@ export function batchedEventUpdates<A, R>(fn: A => R, a: A): R {
     return fn(a);
   } finally {
     executionContext = prevExecutionContext;
-	  console.log('execution context batchedEventUpdates 1143: ', executionContext);
+	  console.log('execution context batchedEventUpdates 1143: ', executionContext, prevExecutionContext);
     if (executionContext === NoContext) {
       // Flush the immediate callbacks that were scheduled during this batch
       resetRenderTimer();
@@ -1175,7 +1179,7 @@ export function discreteUpdates<A, B, C, D, R>(
     } finally {
       setCurrentUpdateLanePriority(previousLanePriority);
       executionContext = prevExecutionContext;
-			console.log('execution context discreteUpdates 1171: ', executionContext);
+			console.log('execution context discreteUpdates 1171: ', executionContext, prevExecutionContext);
       if (executionContext === NoContext) {
         // Flush the immediate callbacks that were scheduled during this batch
         resetRenderTimer();
@@ -1190,7 +1194,7 @@ export function discreteUpdates<A, B, C, D, R>(
       );
     } finally {
       executionContext = prevExecutionContext;
-			console.log('execution context discreteUpdates 1186: ', executionContext);
+			console.log('execution context discreteUpdates 1186: ', executionContext, prevExecutionContext);
       if (executionContext === NoContext) {
         // Flush the immediate callbacks that were scheduled during this batch
         resetRenderTimer();
@@ -1210,7 +1214,7 @@ export function unbatchedUpdates<A, R>(fn: (a: A) => R, a: A): R {
     return fn(a);
   } finally {
     executionContext = prevExecutionContext;
-		console.log('execution context unbatchedUpdates 1204: ', executionContext);
+		console.log('execution context unbatchedUpdates 1204: ', executionContext, prevExecutionContext);
     if (executionContext === NoContext) {
       // Flush the immediate callbacks that were scheduled during this batch
       resetRenderTimer();
@@ -1261,7 +1265,7 @@ export function flushSync<A, R>(fn: A => R, a: A): R {
       }
     } finally {
       executionContext = prevExecutionContext;
-		  console.log('execution context flushSync 1254: ', executionContext);
+		  console.log('execution context flushSync 1254: ', executionContext, prevExecutionContext);
       // Flush the immediate callbacks that were scheduled during this batch.
       // Note that this will happen even if batchedUpdates is higher up
       // the stack.
@@ -1283,7 +1287,7 @@ export function flushControlled(fn: () => mixed): void {
       setCurrentUpdateLanePriority(previousLanePriority);
 
       executionContext = prevExecutionContext;
-		  console.log('execution context flushControlled 1275: ', executionContext);
+		  console.log('execution context flushControlled 1275: ', executionContext, prevExecutionContext);
       if (executionContext === NoContext) {
         // Flush the immediate callbacks that were scheduled during this batch
         resetRenderTimer();
@@ -1295,7 +1299,7 @@ export function flushControlled(fn: () => mixed): void {
       runWithPriority(ImmediateSchedulerPriority, fn);
     } finally {
       executionContext = prevExecutionContext;
-		  console.log('execution context flushControlled 1287: ', executionContext);
+		  console.log('execution context flushControlled 1287: ', executionContext, prevExecutionContext);
       if (executionContext === NoContext) {
         // Flush the immediate callbacks that were scheduled during this batch
         resetRenderTimer();
@@ -1547,7 +1551,7 @@ function renderRootSync(root: FiberRoot, lanes: Lanes) {
   }
 
   executionContext = prevExecutionContext;
-	console.log('execution context renderRootSync 1538: ', executionContext);
+	console.log('execution context renderRootSync 1538: ', executionContext, prevExecutionContext);
   popDispatcher(prevDispatcher);
 
   if (workInProgress !== null) {
@@ -1626,7 +1630,7 @@ function renderRootConcurrent(root: FiberRoot, lanes: Lanes) {
 
   popDispatcher(prevDispatcher);
   executionContext = prevExecutionContext;
-	console.log('execution context renderRootSync 1616: ', executionContext);
+	console.log('execution context renderRootSync 1616: ', executionContext, prevExecutionContext);
 
   if (__DEV__) {
     if (enableDebugTracing) {
@@ -2147,7 +2151,7 @@ function commitRootImpl(root, renderPriorityLevel) {
       popInteractions(((prevInteractions: any): Set<Interaction>));
     }
     executionContext = prevExecutionContext;
-	  console.log('execution context commitRootImpl 2129: ', executionContext);
+	  console.log('execution context commitRootImpl 2129: ', executionContext, prevExecutionContext);
 
     if (decoupleUpdatePriorityFromScheduler && previousLanePriority != null) {
       // Reset the priority to the previous non-sync value.
@@ -2736,7 +2740,7 @@ function flushPassiveEffectsImpl() {
   }
 
   executionContext = prevExecutionContext;
-	console.log('execution context flushPassiveEffectsImpl 2129: ', executionContext);
+	console.log('execution context flushPassiveEffectsImpl 2129: ', executionContext, prevExecutionContext);
 
   flushSyncCallbackQueue();
 
