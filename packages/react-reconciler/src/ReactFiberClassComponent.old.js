@@ -196,17 +196,25 @@ const classComponentUpdater = {
     const fiber = getInstance(inst);
     const eventTime = requestEventTime();
     const lane = requestUpdateLane(fiber);
+		console.log('in enqueueSetState');
+		console.log('enqueueSetState fiber: ', fiber);
+		console.log('enqueueSetState eventTime: ', eventTime);
+		console.log('enqueueSetState lane: ', lane);
 
     const update = createUpdate(eventTime, lane);
     update.payload = payload;
+		console.log('enqueueSetState update payload: ', payload);
     if (callback !== undefined && callback !== null) {
       if (__DEV__) {
         warnOnInvalidCallback(callback, 'setState');
       }
+		  console.log('enqueueSetState update callback: ', callback);
       update.callback = callback;
     }
 
+		console.log('enqueing update for: ', update);
     enqueueUpdate(fiber, update);
+		console.log('scheduling update for fiber: ', fiber);
     scheduleUpdateOnFiber(fiber, lane, eventTime);
 
     if (__DEV__) {

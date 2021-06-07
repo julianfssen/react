@@ -537,10 +537,12 @@ export function scheduleUpdateOnFiber(
     // `deferRenderPhaseUpdateToNextBatch` flag is off and this is a render
     // phase update. In that case, we don't treat render phase updates as if
     // they were interleaved, for backwards compat reasons.
+		console.log('in a work in progress root');
     if (
       deferRenderPhaseUpdateToNextBatch ||
       (executionContext & RenderContext) === NoContext
     ) {
+			console.log('mark that work happened while rendering');
       workInProgressRootUpdatedLanes = mergeLanes(
         workInProgressRootUpdatedLanes,
         lane,
@@ -553,6 +555,7 @@ export function scheduleUpdateOnFiber(
       // effect of interrupting the current render and switching to the update.
       // TODO: Make sure this doesn't override pings that happen while we've
       // already started rendering.
+			console.log('mark that work is suspended with a delay');
       markRootSuspended(root, workInProgressRootRenderLanes);
     }
   }
@@ -568,6 +571,7 @@ export function scheduleUpdateOnFiber(
       // Check if we're not already rendering
       (executionContext & (RenderContext | CommitContext)) === NoContext
     ) {
+			console.log('in unbatchedUpdates and not currently rendering');
       // Register pending interactions on the root to avoid losing traced interaction data.
       schedulePendingInteractions(root, lane);
 
@@ -585,12 +589,14 @@ export function scheduleUpdateOnFiber(
         // scheduleCallbackForFiber to preserve the ability to schedule a callback
         // without immediately flushing it. We only do this for user-initiated
         // updates, to preserve historical behavior of legacy mode.
+				console.log('flush work when we in an unbatchaded update and its rendering');
         resetRenderTimer();
         flushSyncCallbackQueue();
       }
     }
   } else {
     // Schedule a discrete update but only if it's not Sync.
+		console.log('schedule a discrete update');
     if (
       (executionContext & DiscreteEventContext) !== NoContext &&
       // Only updates at user-blocking priority or greater are considered

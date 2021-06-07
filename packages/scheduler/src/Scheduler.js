@@ -109,6 +109,8 @@ function handleTimeout(currentTime) {
   if (!isHostCallbackScheduled) {
     if (peek(taskQueue) !== null) {
       isHostCallbackScheduled = true;
+			console.log('host callback is not yet scheduled');
+			console.log('requesting host callback in handleTimeout 112');
       requestHostCallback(flushWork);
     } else {
       const firstTimer = peek(timerQueue);
@@ -129,6 +131,7 @@ function flushWork(hasTimeRemaining, initialTime) {
   if (isHostTimeoutScheduled) {
     // We scheduled a timeout but it's no longer needed. Cancel it.
     isHostTimeoutScheduled = false;
+		console.log('canceling timeout in flushWork');
     cancelHostTimeout();
   }
 
@@ -137,6 +140,7 @@ function flushWork(hasTimeRemaining, initialTime) {
   try {
     if (enableProfiling) {
       try {
+				console.log('running workLoop with profiling enabled in flushwork')
         return workLoop(hasTimeRemaining, initialTime);
       } catch (error) {
         if (currentTask !== null) {
@@ -148,6 +152,7 @@ function flushWork(hasTimeRemaining, initialTime) {
       }
     } else {
       // No catch in prod code path.
+			console.log('running workLoop without profiling enabled in flushwork')
       return workLoop(hasTimeRemaining, initialTime);
     }
   } finally {
@@ -165,6 +170,7 @@ function workLoop(hasTimeRemaining, initialTime) {
   let currentTime = initialTime;
   advanceTimers(currentTime);
   currentTask = peek(taskQueue);
+	console.log('current workloop task: ', currentTask);
   while (
     currentTask !== null &&
     !(enableSchedulerDebugging && isSchedulerPaused)
@@ -173,16 +179,20 @@ function workLoop(hasTimeRemaining, initialTime) {
       currentTask.expirationTime > currentTime &&
       (!hasTimeRemaining || shouldYieldToHost())
     ) {
+	    console.log("current task has not expired but we've reached deadline");
       // This currentTask hasn't expired, and we've reached the deadline.
       break;
     }
     const callback = currentTask.callback;
+		console.log('currentTask callback in workloop: ', callback);
     if (typeof callback === 'function') {
       currentTask.callback = null;
       currentPriorityLevel = currentTask.priorityLevel;
       const didUserCallbackTimeout = currentTask.expirationTime <= currentTime;
       markTaskRun(currentTask, currentTime);
+			console.log('calling back callback in workLoop');
       const continuationCallback = callback(didUserCallbackTimeout);
+			console.log('continuation callback from callback in workLoop');
       currentTime = getCurrentTime();
       if (typeof continuationCallback === 'function') {
         currentTask.callback = continuationCallback;
@@ -193,6 +203,7 @@ function workLoop(hasTimeRemaining, initialTime) {
           currentTask.isQueued = false;
         }
         if (currentTask === peek(taskQueue)) {
+					console.log('complete current task and pop from taskQueue');
           pop(taskQueue);
         }
       }
@@ -350,7 +361,7 @@ function unstable_scheduleCallback(priorityLevel, callback, options) {
 	  console.log('this is a not delayed task');
     newTask.sortIndex = expirationTime;
     push(taskQueue, newTask);
-		console.log('task queue: ', taskQueue);
+		console.log('task queue: ', taskQueue, taskQueue.length);
     if (enableProfiling) {
       markTaskStart(newTask, currentTime);
       newTask.isQueued = true;
@@ -359,7 +370,9 @@ function unstable_scheduleCallback(priorityLevel, callback, options) {
     // wait until the next time we yield.
     if (!isHostCallbackScheduled && !isPerformingWork) {
       isHostCallbackScheduled = true;
+			console.log('host callback is not yet scheduled and is not performing work');
 			console.log('requesting host callback');
+			console.log('requesting host callback in unstableScheduleCallback 366');
       requestHostCallback(flushWork);
     }
   }
@@ -375,6 +388,9 @@ function unstable_continueExecution() {
   isSchedulerPaused = false;
   if (!isHostCallbackScheduled && !isPerformingWork) {
     isHostCallbackScheduled = true;
+		console.log('host callback is not yet scheduled and is not performing work');
+		console.log('requesting host callback');
+		console.log('requesting host callback in unstableContinueExecution 384');
     requestHostCallback(flushWork);
   }
 }

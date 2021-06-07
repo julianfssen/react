@@ -197,17 +197,22 @@ export function createUpdate(eventTime: number, lane: Lane): Update<*> {
 
 export function enqueueUpdate<State>(fiber: Fiber, update: Update<State>) {
   const updateQueue = fiber.updateQueue;
+	console.log('current update in enqueueUpdate: ', update);
+	console.log('current updateQueue in enqueueUpdate: ', updateQueue);
   if (updateQueue === null) {
     // Only occurs if the fiber has been unmounted.
     return;
   }
 
   const sharedQueue: SharedQueue<State> = (updateQueue: any).shared;
+	console.log('sharedQueue in enqueueUpdate: ', updateQueue);
   const pending = sharedQueue.pending;
+	console.log('pending update in sharedQueue: ', pending);
   if (pending === null) {
     // This is the first update. Create a circular list.
     update.next = update;
   } else {
+		console.log('next pending update: ', pending.next);
     update.next = pending.next;
     pending.next = update;
   }

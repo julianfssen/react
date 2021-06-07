@@ -121,6 +121,10 @@ if (
   const maxYieldInterval = 300;
   let needsPaint = false;
 
+	console.log('enableIsInputPending: ', enableIsInputPending);
+	console.log('navigator: ', navigator);
+	console.log('navigator.schedling: ', navigator.scheduling);
+
   if (
     enableIsInputPending &&
     navigator !== undefined &&
@@ -140,24 +144,29 @@ if (
         // accompanied by a call to `requestPaint`, or other main thread tasks
         // like network events.
         if (needsPaint || scheduling.isInputPending()) {
+					console.log('pending paint or intpu');
           // There is either a pending paint or a pending input.
           return true;
         }
         // There's no pending input. Only yield if we've reached the max
         // yield interval.
+				console.log('no pending paint or input');
         return currentTime >= maxYieldInterval;
       } else {
         // There's still time left in the frame.
+				console.log('theres time left in frame');
         return false;
       }
     };
 
+		console.log('request for browser paint');
     requestPaint = function() {
       needsPaint = true;
     };
   } else {
     // `isInputPending` is not available. Since we have no way of knowing if
     // there's pending input, always yield at the end of the frame.
+		console.log('is input pending is not available');
     shouldYieldToHost = function() {
       return getCurrentTime() >= deadline;
     };
@@ -185,6 +194,7 @@ if (
 
   const performWorkUntilDeadline = () => {
 		console.log('in perform work until deadline');
+		console.log('scheduled host callback in perform work until deadline', scheduledHostCallback);
     if (scheduledHostCallback !== null) {
       const currentTime = getCurrentTime();
       // Yield after `yieldInterval` ms, regardless of where we are in the vsync
@@ -236,16 +246,19 @@ if (
   };
 
   cancelHostCallback = function() {
+		console.log('cancelling host callback');
     scheduledHostCallback = null;
   };
 
   requestHostTimeout = function(callback, ms) {
+		console.log('erquesting host timeout');
     taskTimeoutID = setTimeout(() => {
       callback(getCurrentTime());
     }, ms);
   };
 
   cancelHostTimeout = function() {
+		console.log('clearing host timeout');
     clearTimeout(taskTimeoutID);
     taskTimeoutID = -1;
   };

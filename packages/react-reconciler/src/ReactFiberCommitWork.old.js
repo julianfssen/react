@@ -486,7 +486,10 @@ function commitLifeCycles(
     }
     case ClassComponent: {
       const instance = finishedWork.stateNode;
+			console.log('class component instance: ', instance, typeof instance);
       if (finishedWork.flags & Update) {
+				console.log('finished work flags: ', finishedWork.flags);
+				console.log('current fiber: ', current);
         if (current === null) {
           // We could update instance props and state here,
           // but instead we rely on them being set during last render.
@@ -530,14 +533,19 @@ function commitLifeCycles(
               recordLayoutEffectDuration(finishedWork);
             }
           } else {
+						console.log('mounting component instance');
             instance.componentDidMount();
           }
         } else {
+					console.log('current is not null');
+					console.log('updating previous state instead');
           const prevProps =
             finishedWork.elementType === finishedWork.type
               ? current.memoizedProps
               : resolveDefaultProps(finishedWork.type, current.memoizedProps);
           const prevState = current.memoizedState;
+					console.log('prevProps: ', prevProps);
+					console.log('prevState: ', prevState);
           // We could update instance props and state here,
           // but instead we rely on them being set during last render.
           // TODO: revisit this when we implement resuming.
@@ -584,6 +592,7 @@ function commitLifeCycles(
               recordLayoutEffectDuration(finishedWork);
             }
           } else {
+						console.log('call componentDidUpdate');
             instance.componentDidUpdate(
               prevProps,
               prevState,

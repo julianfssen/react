@@ -192,10 +192,12 @@ function flushSyncCallbackQueueImpl() {
       try {
         const isSync = true;
         const queue = syncQueue;
+				console.log('queue in decoupleUpdatePriorityFromScheduler');
         setCurrentUpdateLanePriority(SyncLanePriority);
         runWithPriority(ImmediatePriority, () => {
           for (; i < queue.length; i++) {
             let callback = queue[i];
+						console.log('flushsynccallbackqueueimpl callback: ', queue);
             do {
               callback = callback(isSync);
             } while (callback !== null);
@@ -221,9 +223,12 @@ function flushSyncCallbackQueueImpl() {
       try {
         const isSync = true;
         const queue = syncQueue;
+				console.log('queue wihtou tdecoupleUpdatePriorityFromScheduler');
+        setCurrentUpdateLanePriority(SyncLanePriority);
         runWithPriority(ImmediatePriority, () => {
           for (; i < queue.length; i++) {
             let callback = queue[i];
+						console.log('flushsynccallbackqueueimpl callback: ', queue);
             do {
               callback = callback(isSync);
             } while (callback !== null);
